@@ -17,7 +17,6 @@
 .*.dep
 cscope.*
 */.libs/
-Makefile
 libelf.so*
 *.inst
 stamp-h

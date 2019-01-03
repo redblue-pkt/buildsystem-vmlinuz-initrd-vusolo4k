@@ -1,11 +1,8 @@
 # generated files
 *.bak
-Makefile
 apps/CA.pl
 apps/openssl
 tools/c_rehash
-crypto/buildinf.h
-crypto/opensslconf.h
 
 # build files
 *.a
