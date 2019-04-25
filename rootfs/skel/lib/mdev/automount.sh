@@ -287,13 +287,13 @@ update_rootfs () {
 				mount ${startup} /mnt/startup
 			fi
 			if [ $1 == 0 ]; then
-				echo "boot emmcflash0.kernel_1 'root=/dev/mmcblk0p5 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M vmalloc=629m bmem=633m@387m bmem=499m@2573m'" >> /mnt/startup/STARTUP # boot from first partition default
-				echo "boot emmcflash0.kernel_1 'root=/dev/mmcblk0p5 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M vmalloc=629m bmem=633m@387m bmem=499m@2573m'" >> /mnt/startup/emmcblk0p5
-				echo "boot emmcflash0.kernel_2 'root=/dev/mmcblk0p7 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M vmalloc=629m bmem=633m@387m bmem=499m@2573m'" >> /mnt/startup/emmcblk0p7
-				echo "boot emmcflash0.kernel_3 'root=/dev/mmcblk0p9 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M vmalloc=629m bmem=633m@387m bmem=499m@2573m'" >> /mnt/startup/emmcblk0p9
-				echo "boot emmcflash0.kernel_4 'root=/dev/mmcblk0p11 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M vmalloc=629m bmem=633m@387m bmem=499m@2573m'" >> /mnt/startup/emmcblk0p11
-				echo "boot -fatfs usbdisk0:zImage 'root=/dev/sdb2 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M vmalloc=629m bmem=633m@387m bmem=499m@2573m'" >> /mnt/startup/usb_with_hdd
-				echo "boot -fatfs usbdisk0:zImage 'root=/dev/sda2 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M vmalloc=629m bmem=633m@387m bmem=499m@2573m'" >> /mnt/startup/usb_without_hdd
+				echo "boot emmcflash0.kernel_1 'root=/dev/mmcblk0p5 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M bmem=633m@387m bmem=499m@2573m'" >> /mnt/startup/STARTUP # boot from first partition default
+				echo "boot emmcflash0.kernel_1 'root=/dev/mmcblk0p5 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M bmem=633m@387m bmem=499m@2573m'" >> /mnt/startup/emmcblk0p5
+				echo "boot emmcflash0.kernel_2 'root=/dev/mmcblk0p7 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M bmem=633m@387m bmem=499m@2573m'" >> /mnt/startup/emmcblk0p7
+				echo "boot emmcflash0.kernel_3 'root=/dev/mmcblk0p9 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M bmem=633m@387m bmem=499m@2573m'" >> /mnt/startup/emmcblk0p9
+				echo "boot emmcflash0.kernel_4 'root=/dev/mmcblk0p11 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M bmem=633m@387m bmem=499m@2573m'" >> /mnt/startup/emmcblk0p11
+				echo "boot -fatfs usbdisk0:zImage 'root=/dev/sdb2 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M bmem=633m@387m bmem=499m@2573m'" >> /mnt/startup/usb_with_hdd
+				echo "boot -fatfs usbdisk0:zImage 'root=/dev/sda2 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M bmem=633m@387m bmem=499m@2573m'" >> /mnt/startup/usb_without_hdd
 			elif [ $1 == 1 ]; then
 				cp -R $2 /mnt/startup/emmcblk0p5
 			elif [ $1 == 2 ]; then
