@@ -25,7 +25,9 @@ kerneldev_4=/dev/mmcblk0p10
 rootfsdev_4=/dev/mmcblk0p11
 rootfsdevSize_4=`cat /proc/partitions | grep mmcblk0p11 | awk '{print $3}'`
 
-ROOTFSDEV_MIN_SIZE=921600	# 900 MB
+ROOTFSDEV_MIN_SIZE=943104	# 921 MB
+
+ENDSECTOR=`sgdisk -E /dev/mmcblk0`
 
 echo "Vuplus Update Start.."
 insmod /etc/vfd_proc.ko
@@ -97,36 +99,36 @@ mk_partition () {
 		sgdisk -o /dev/mmcblk0
 	}
 	mk_standard_part () {
-		sgdisk -a 1 -n 2:40960:73727 -c 2:"initrd" /dev/mmcblk0
-		sgdisk -a 1 -n 3:73728:77823 -c 3:"splash" /dev/mmcblk0
-		sgdisk -a 1 -n 1:8192:40959 -c 1:"kernel" /dev/mmcblk0
-		sgdisk -a 1 -n 4:77824:7626751 -c 4:"rootfs" /dev/mmcblk0
+		sgdisk -a 1 -n 2:20480:45055 -c 2:"initrd" /dev/mmcblk0
+		sgdisk -a 1 -n 3:45056:49151 -c 3:"splash" /dev/mmcblk0
+		sgdisk -a 1 -n 1:8192:20479 -c 1:"kernel" /dev/mmcblk0
+		sgdisk -a 1 -n 4:49152:${ENDSECTOR} -c 4:"rootfs" /dev/mmcblk0
 		mkfs.ext4 $1
 	}
 	mk_multiboot_simple_part () {
-		sgdisk -a 1 -n 2:40960:73727 -c 2:"initrd" /dev/mmcblk0
-		sgdisk -a 1 -n 3:73728:77823 -c 3:"splash" /dev/mmcblk0
-		sgdisk -a 1 -n 1:8192:40959 -c 1:"startup" /dev/mmcblk0
+		sgdisk -a 1 -n 2:10240:34815 -c 2:"initrd" /dev/mmcblk0
+		sgdisk -a 1 -n 3:34816:38911 -c 3:"splash" /dev/mmcblk0
+		sgdisk -a 1 -n 1:8192:10239 -c 1:"startup" /dev/mmcblk0
 		mkfs.vfat $1
 	}
 	mk_multiboot_part_1 () {
-		sgdisk -a 1 -n 4:77824:110591 -c 4:"kernel_1" /dev/mmcblk0
-		sgdisk -a 1 -n 5:110592:1964032 -c 5:"rootfs_1" /dev/mmcblk0
+		sgdisk -a 1 -n 4:38912:51199 -c 4:"kernel_1" /dev/mmcblk0
+		sgdisk -a 1 -n 5:51200:1937407 -c 5:"rootfs_1" /dev/mmcblk0
 		mkfs.ext4 $1
 	}
 	mk_multiboot_part_2 () {
-		sgdisk -a 1 -n 6:1964033:1996800 -c 6:"kernel_2" /dev/mmcblk0
-		sgdisk -a 1 -n 7:1996801:3850241 -c 7:"rootfs_2" /dev/mmcblk0
+		sgdisk -a 1 -n 6:1937408:1949695 -c 6:"kernel_2" /dev/mmcblk0
+		sgdisk -a 1 -n 7:1949696:3835903 -c 7:"rootfs_2" /dev/mmcblk0
 		mkfs.ext4 $1
 	}
 	mk_multiboot_part_3 () {
-		sgdisk -a 1 -n 8:3850242:3883009 -c 8:"kernel_3" /dev/mmcblk0
-		sgdisk -a 1 -n 9:3883010:5736450 -c 9:"rootfs_3" /dev/mmcblk0
+		sgdisk -a 1 -n 8:3835904:3848191 -c 8:"kernel_3" /dev/mmcblk0
+		sgdisk -a 1 -n 9:3848192:5734399 -c 9:"rootfs_3" /dev/mmcblk0
 		mkfs.ext4 $1
 	}
 	mk_multiboot_part_4 () {
-		sgdisk -a 1 -n 10:5736451:5769218 -c 10:"kernel_4" /dev/mmcblk0
-		sgdisk -a 1 -n 11:5769219:7622659 -c 11:"rootfs_4" /dev/mmcblk0
+		sgdisk -a 1 -n 10:5734400:5746687 -c 10:"kernel_4" /dev/mmcblk0
+		sgdisk -a 1 -n 11:5746688:${ENDSECTOR} -c 11:"rootfs_4" /dev/mmcblk0
 		mkfs.ext4 $1
 	}
 	if [ -e ${destdir}/$1/$V_ROOTFS_STANDARD_FILENAME ] \
@@ -161,16 +163,16 @@ mk_partition () {
 			mk_multiboot_simple_part ${startup}
 		fi
 		if [ -e ${destdir}/$1/$V_ROOTFS_1_FILENAME_BZ2 ]; then
-			mk_multiboot_part_1 ${rootfsdec_1}
+			mk_multiboot_part_1 ${rootfsdev_1}
 		fi
 		if [ -e ${destdir}/$1/$V_ROOTFS_2_FILENAME_BZ2 ]; then
-			mk_multiboot_part_2 ${rootfsdec_2}
+			mk_multiboot_part_2 ${rootfsdev_2}
 		fi
 		if [ -e ${destdir}/$1/$V_ROOTFS_3_FILENAME_BZ2 ]; then
-			mk_multiboot_part_3 ${rootfsdec_3}
+			mk_multiboot_part_3 ${rootfsdev_3}
 		fi
 		if [ -e ${destdir}/$1/$V_ROOTFS_4_FILENAME_BZ2 ]; then
-			mk_multiboot_part_4 ${rootfsdec_4}
+			mk_multiboot_part_4 ${rootfsdev_4}
 		fi
 	elif [ -e ${destdir}/$1/$V_ROOTFS_1_FILENAME_GZ ] \
 	|| [ -e ${destdir}/$1/$V_ROOTFS_2_FILENAME_GZ ] \
@@ -184,16 +186,16 @@ mk_partition () {
 			mk_multiboot_simple_part ${startup}
 		fi
 		if [ -e ${destdir}/$1/$V_ROOTFS_1_FILENAME_GZ ]; then
-			mk_multiboot_part_1 ${rootfsdec_1}
+			mk_multiboot_part_1 ${rootfsdev_1}
 		fi
 		if [ -e ${destdir}/$1/$V_ROOTFS_2_FILENAME_GZ ]; then
-			mk_multiboot_part_2 ${rootfsdec_2}
+			mk_multiboot_part_2 ${rootfsdev_2}
 		fi
 		if [ -e ${destdir}/$1/$V_ROOTFS_3_FILENAME_GZ ]; then
-			mk_multiboot_part_3 ${rootfsdec_3}
+			mk_multiboot_part_3 ${rootfsdev_3}
 		fi
 		if [ -e ${destdir}/$1/$V_ROOTFS_4_FILENAME_GZ ]; then
-			mk_multiboot_part_4 ${rootfsdec_4}
+			mk_multiboot_part_4 ${rootfsdev_4}
 		fi
 	else
 		update_error_part
