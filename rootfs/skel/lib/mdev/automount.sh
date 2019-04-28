@@ -111,7 +111,7 @@ mk_partition () {
 	}
 	mk_multiboot_part_1 () {
 		sgdisk -a 1 -n 4:77824:110591 -c 4:"kernel_1" /dev/mmcblk0
-		sgdisk -a 1 -n 5:110592:1964032 -c 5:"rootfs_2" /dev/mmcblk0
+		sgdisk -a 1 -n 5:110592:1964032 -c 5:"rootfs_1" /dev/mmcblk0
 		mkfs.ext4 $1
 	}
 	mk_multiboot_part_2 () {
