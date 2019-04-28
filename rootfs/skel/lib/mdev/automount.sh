@@ -328,7 +328,7 @@ update_rootfs () {
 			if [ $1 == bz2 ]; then
 				tar xjf $2
 			elif [ $1 == gz ]; then
-				tar xjf $2
+				tar xzf $2
 			fi
 			mv romfs/* .
 			rmdir romfs
@@ -355,7 +355,7 @@ update_rootfs () {
 			if [ $1 == bz2 ]; then
 				tar xjf $2
 			elif [ $1 == gz ]; then
-				tar xjf $2
+				tar xzf $2
 			fi
 			mv romfs/* .
 			rmdir romfs
@@ -382,7 +382,7 @@ update_rootfs () {
 			if [ $1 == bz2 ]; then
 				tar xjf $2
 			elif [ $1 == gz ]; then
-				tar xjf $2
+				tar xzf $2
 			fi
 			mv romfs/* .
 			rmdir romfs
@@ -409,7 +409,7 @@ update_rootfs () {
  			if [ $1 == bz2 ]; then
 				tar xjf $2
 			elif [ $1 == gz ]; then
-				tar xjf $2
+				tar xzf $2
 			fi
 			mv romfs/* .
 			rmdir romfs
