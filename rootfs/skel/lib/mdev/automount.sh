@@ -27,7 +27,9 @@ rootfsdevSize_4=`cat /proc/partitions | grep mmcblk0p11 | awk '{print $3}'`
 
 ROOTFSDEV_MIN_SIZE=943104	# 921 MB
 
-ENDSECTOR=`sgdisk -E /dev/mmcblk0`
+#ENDSECTOR=`sgdisk -E /dev/mmcblk0`
+#ENDSECTOR=$((5746688+1886207))
+ENDSECTOR=7632895
 
 echo "Vuplus Update Start.."
 insmod /etc/vfd_proc.ko
@@ -36,25 +38,25 @@ VU_MODEL=solo4k
 
 V_ROOTFS_STANDARD_FILENAME=/vuplus/$VU_MODEL/rootfs.tar.bz2
 
-V_ROOTFS_1_FILENAME_BZ2=/vuplus/$VU_MODEL/rootfs_1.ext4.tar.bz2
-V_ROOTFS_2_FILENAME_BZ2=/vuplus/$VU_MODEL/rootfs_2.ext4.tar.bz2
-V_ROOTFS_3_FILENAME_BZ2=/vuplus/$VU_MODEL/rootfs_3.ext4.tar.bz2
-V_ROOTFS_4_FILENAME_BZ2=/vuplus/$VU_MODEL/rootfs_4.ext4.tar.bz2
+V_ROOTFS_1_FILENAME_BZ2=/vuplus/$VU_MODEL/rootfs1.tar.bz2
+V_ROOTFS_2_FILENAME_BZ2=/vuplus/$VU_MODEL/rootfs2.tar.bz2
+V_ROOTFS_3_FILENAME_BZ2=/vuplus/$VU_MODEL/rootfs3.tar.bz2
+V_ROOTFS_4_FILENAME_BZ2=/vuplus/$VU_MODEL/rootfs4.tar.bz2
 
-V_ROOTFS_1_FILENAME_GZ=/vuplus/$VU_MODEL/rootfs_1.ext4.tar.gz
-V_ROOTFS_2_FILENAME_GZ=/vuplus/$VU_MODEL/rootfs_2.ext4.tar.gz
-V_ROOTFS_3_FILENAME_GZ=/vuplus/$VU_MODEL/rootfs_3.ext4.tar.gz
-V_ROOTFS_4_FILENAME_GZ=/vuplus/$VU_MODEL/rootfs_4.ext4.tar.gz
+V_ROOTFS_1_FILENAME_GZ=/vuplus/$VU_MODEL/rootfs1.tar.gz
+V_ROOTFS_2_FILENAME_GZ=/vuplus/$VU_MODEL/rootfs2.tar.gz
+V_ROOTFS_3_FILENAME_GZ=/vuplus/$VU_MODEL/rootfs3.tar.gz
+V_ROOTFS_4_FILENAME_GZ=/vuplus/$VU_MODEL/rootfs4.tar.gz
 
 V_REBOOT_FILENAME=/vuplus/$VU_MODEL/reboot.update
 V_MKPART_FILENAME=/vuplus/$VU_MODEL/mkpart.update
 
 V_KERNEL_STANDARD_FILENAME=/vuplus/$VU_MODEL/kernel_auto.bin
 
-V_KERNEL_1_FILENAME=/vuplus/$VU_MODEL/kernel_1_auto.bin
-V_KERNEL_2_FILENAME=/vuplus/$VU_MODEL/kernel_2_auto.bin
-V_KERNEL_3_FILENAME=/vuplus/$VU_MODEL/kernel_3_auto.bin
-V_KERNEL_4_FILENAME=/vuplus/$VU_MODEL/kernel_4_auto.bin
+V_KERNEL_1_FILENAME=/vuplus/$VU_MODEL/kernel1_auto.bin
+V_KERNEL_2_FILENAME=/vuplus/$VU_MODEL/kernel2_auto.bin
+V_KERNEL_3_FILENAME=/vuplus/$VU_MODEL/kernel3_auto.bin
+V_KERNEL_4_FILENAME=/vuplus/$VU_MODEL/kernel4_auto.bin
 
 V_SPLASH_FILENAME=/vuplus/$VU_MODEL/splash_auto.bin
 
@@ -66,34 +68,34 @@ V_ENV_BOOT_USB_WITH_HDD=/vuplus/$VU_MODEL/boot_env_usbdisk0_with_hdd
 V_ENV_BOOT_USB_WITHOUT_HDD=/vuplus/$VU_MODEL/boot_env_usbdisk0_without_hdd
 
 update_welcome_message () {
-	echo -e "Start\n Update Script\n" > /tmp/msg
+	echo -e "Start\nUpdate Script\n" > /tmp/msg
 	cat /tmp/msg > /proc/vfd
 	sleep 5;
 }
 
 update_error_kernel () {
-	echo -e "Updating\n    Kernel Error!!\n" > /tmp/msg
+	echo -e "Updating\nKernel Error!\n" > /tmp/msg
 	cat /tmp/msg > /proc/vfd
 	exit 0;
 }
 
 update_error_rootfs () {
-	echo -e "Updating\n    Rootfs Error!!\n" > /tmp/msg
+	echo -e "Updating\nRootfs Error!\n" > /tmp/msg
 	cat /tmp/msg > /proc/vfd
 	exit 0;
 }
 
 update_error_part () {
-	echo -e "Updating\n    Part Error!!\n" > /tmp/msg
+	echo -e "Updating\nPart Error!\n" > /tmp/msg
 	cat /tmp/msg > /proc/vfd
 	exit 0;
 }
 
 mk_partition () {
-	echo -e "Creating\n     Partition" > /tmp/msg
+	echo -e "Creating\nPartition" > /tmp/msg
 	cat /tmp/msg > /proc/vfd
 
-	echo -e "Making\n   File System" > /tmp/msg
+	echo -e "Making\nFile System" > /tmp/msg
 	cat /tmp/msg > /proc/vfd
 	mk_clean_part () {
 		sgdisk -o /dev/mmcblk0
@@ -203,7 +205,7 @@ mk_partition () {
 }
 
 update_kernel () {
-	echo -e "Updating\n      Kernel" > /tmp/msg
+	echo -e "Updating\nKernel" > /tmp/msg
 	cat /tmp/msg > /proc/vfd
 	if [ -e ${destdir}/$1/$V_KERNEL_STANDARD_FILENAME ] \
 	&& [ ! -e ${destdir}/$1/$V_KERNEL_1_FILENAME ] \
@@ -233,14 +235,14 @@ update_kernel () {
 }
 
 update_splash () {
-	echo -e "Updating\n      Splash" > /tmp/msg
+	echo -e "Updating\nSplash" > /tmp/msg
 	cat /tmp/msg > /proc/vfd
 	dd if=${destdir}/$1/$V_SPLASH_FILENAME of=${splashdev}
 }
 
 update_rootfs () {
 	echo "update_rootfs ${destdir}/$1"
-	echo -e "Updating\n      rootfs" > /tmp/msg
+	echo -e "Updating\nRootFS" > /tmp/msg
 	cat /tmp/msg > /proc/vfd
 
 	if [ -e ${destdir}/$1/$V_ROOTFS_STANDARD_FILENAME ] \
@@ -278,7 +280,7 @@ update_rootfs () {
 	|| [ -e ${destdir}/$1/$V_ROOTFS_3_FILENAME_GZ ] \
 	|| [ -e ${destdir}/$1/$V_ROOTFS_4_FILENAME_GZ ]; then
 		do_first_part () {
-			echo -e "Update\n  Startup Part\n" > /tmp/msg
+			echo -e "Update\nStartup Part\n" > /tmp/msg
 			cat /tmp/msg > /proc/vfd
 			if [ ! -e /mnt/startup ]; then
 				mkdir /mnt/startup
@@ -315,7 +317,7 @@ update_rootfs () {
 			#return 0
 		}
 		do_rootfs_part1 () {
-			echo -e "Update\n  Rootfs Part1\n" > /tmp/msg
+			echo -e "Update\nRootFS Part 1\n" > /tmp/msg
 			cat /tmp/msg > /proc/vfd
 			if [ ! -e /mnt/rootfs_1 ]; then
 				mkdir /mnt/rootfs_1
@@ -342,7 +344,7 @@ update_rootfs () {
 			#return 0
 		}
 		do_rootfs_part2 () {
-			echo -e "Update\n  Rootfs Part2\n" > /tmp/msg
+			echo -e "Update\nRootFS Part 2\n" > /tmp/msg
 			cat /tmp/msg > /proc/vfd
 			if [ ! -e /mnt/rootfs_2 ]; then
 				mkdir /mnt/rootfs_2
@@ -369,7 +371,7 @@ update_rootfs () {
 			#return 0
 		}
 		do_rootfs_part3 () {
-			echo -e "Update\n  Rootfs Part3\n" > /tmp/msg
+			echo -e "Update\nRootFS Part 3\n" > /tmp/msg
 			cat /tmp/msg > /proc/vfd
 			if [ ! -e /mnt/rootfs_3 ]; then
 				mkdir /mnt/rootfs_3
@@ -396,7 +398,7 @@ update_rootfs () {
 			#return 0
 		}
 		do_rootfs_part4 () {
-			echo -e "Update\n  Rootfs Part4\n" > /tmp/msg
+			echo -e "Update\nRootFS Part 4\n" > /tmp/msg
 			cat /tmp/msg > /proc/vfd
 			if [ ! -e /mnt/rootfs_4 ]; then
 				mkdir /mnt/rootfs_4
@@ -529,22 +531,22 @@ display_vfd_loop () {
 			let loop_count=$loop_count+1
 			let reboot_sec=$delay_cnt-$loop_count+1
 			echo "Rebooting in $reboot_sec seconds"
-			echo -e "Reboot\n in $reboot_sec seconds" > /tmp/msg
+			echo -e "Reboot\nin $reboot_sec seconds" > /tmp/msg
 			cat /tmp/msg > /proc/vfd
 			sleep 0.6
 		done
 		echo " " > /proc/vfd
 		return 0
 	fi
-        sync
-        sync
-        while [ 1 ]
-        do
-                echo "Update Complete"
-                echo -e "Update\n    Complete" > /tmp/msg
-				cat /tmp/msg > /proc/vfd
-                sleep 1
-        done
+	sync
+	sync
+	while [ 1 ]
+	do
+		echo "Update Complete"
+		echo -e "Update\nComplete" > /tmp/msg
+		cat /tmp/msg > /proc/vfd
+		sleep 1
+		done
 
 	return 0
 }
