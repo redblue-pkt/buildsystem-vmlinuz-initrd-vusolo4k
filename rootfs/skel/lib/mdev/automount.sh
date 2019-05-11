@@ -31,7 +31,7 @@ ROOTFSDEV_MIN_SIZE=943104	# 921 MB
 #ENDSECTOR=$((5746688+1886207))
 ENDSECTOR=7632895
 
-REV=8fce0c4
+REV=e7c86f8
 
 echo "Vuplus Update Start.."
 insmod /etc/vfd_proc.ko
