@@ -54,7 +54,7 @@
 
 #define CNTR_OVERFLOW			0x80000000
 
-#if defined(CONFIG_CPU_BMIPS3300)
+#if defined(CONFIG_CPU_BMIPS32_3300)
 
 /* These registers do not conform to any known MIPS standard */
 #define r_perfcntr0()			__read_32bit_c0_register($25, 0)

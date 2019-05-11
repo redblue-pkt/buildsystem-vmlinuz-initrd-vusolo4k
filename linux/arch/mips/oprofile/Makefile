@@ -14,5 +14,5 @@ oprofile-$(CONFIG_CPU_R10000)		+= op_model_mipsxx.o
 oprofile-$(CONFIG_CPU_SB1)		+= op_model_mipsxx.o
 oprofile-$(CONFIG_CPU_XLR)		+= op_model_mipsxx.o
 oprofile-$(CONFIG_CPU_LOONGSON2)	+= op_model_loongson2.o
-oprofile-$(CONFIG_CPU_BMIPS3300)	+= op_model_bmips.o
+oprofile-$(CONFIG_CPU_BMIPS32_3300)	+= op_model_bmips.o
 oprofile-$(CONFIG_CPU_BMIPS4380)	+= op_model_bmips.o

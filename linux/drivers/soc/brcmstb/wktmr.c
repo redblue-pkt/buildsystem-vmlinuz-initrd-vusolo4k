@@ -54,6 +54,11 @@ static struct brcmstb_waketmr {
 #define BRCMSTB_WKTMR_PRESCALER		0x0C
 #define BRCMSTB_WKTMR_PRESCALER_VAL	0x10
 
+/* Fixed 27Mhz frequency since WKTMR is in the UPG clock domain. This
+ * information should come from Device Tree eventually
+ */
+#define WKTMR_FREQ		27000000
+
 static inline void brcmstb_waketmr_clear_alarm(struct brcmstb_waketmr *timer)
 {
 	writel_relaxed(1, timer->base + BRCMSTB_WKTMR_EVENT);
@@ -68,6 +73,9 @@ static void brcmstb_waketmr_set_alarm(struct brcmstb_waketmr *timer,
 
 	brcmstb_waketmr_clear_alarm(timer);
 
+	/* Make sure we are actually counting in seconds */
+	writel_relaxed(WKTMR_FREQ, timer->base + BRCMSTB_WKTMR_PRESCALER);
+
 	if (timer->alarm_set_from_sysfs)
 		t = readl_relaxed(timer->base + BRCMSTB_WKTMR_COUNTER);
 	writel_relaxed(t + secs + 1, timer->base + BRCMSTB_WKTMR_ALARM);
@@ -81,11 +89,6 @@ static irqreturn_t brcmstb_waketmr_irq(int irq, void *data)
 	timer->alarm_is_active = false;
 	return IRQ_HANDLED;
 }
-
-/* Fixed 27Mhz frequency since WKTMR is in the UPG clock domain. This
- * information should come from Device Tree eventually
- */
-#define WKTMR_FREQ		27000000
 
 struct wktmr_time {
 	u32			sec;

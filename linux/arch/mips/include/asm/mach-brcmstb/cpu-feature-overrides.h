@@ -24,7 +24,7 @@
 #define cpu_icache_line_size()		64
 #define cpu_scache_line_size()		0
 
-#elif defined(CONFIG_CPU_BMIPS3300)
+#elif defined(CONFIG_CPU_BMIPS32_3300)
 
 #define cpu_has_dc_aliases		1
 #define cpu_has_ic_fills_f_dc		0

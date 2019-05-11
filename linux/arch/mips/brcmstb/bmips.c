@@ -45,7 +45,7 @@
 
 void brcmstb_cpu_setup(void)
 {
-#if   defined(CONFIG_CPU_BMIPS3300)
+#if   defined(CONFIG_CPU_BMIPS32_3300)
 
 	unsigned long cbr = __BMIPS_GET_CBR();
 
@@ -431,7 +431,7 @@ void brcm_set_cpu_speed(void *arg)
 
 	/* see BMIPS datasheet, CP0 register $22 */
 
-#if defined(CONFIG_CPU_BMIPS3300)
+#if defined(CONFIG_CPU_BMIPS32_3300)
 	change_c0_brcm_bus_pll(0x07 << 22, (new_div << 23) | (0 << 22));
 #elif defined(CONFIG_CPU_BMIPS5000)
 	change_c0_brcm_mode(0x0f << 4, (1 << 7) | (new_div << 4));

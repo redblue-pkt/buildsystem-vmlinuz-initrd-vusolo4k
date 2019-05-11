@@ -775,7 +775,6 @@ static int brcmstb_nand_low_level_op(struct brcmstb_nand_host *host,
 	DBG("%s: cmd 0x%lx\n", __func__, (unsigned long)tmp);
 
 	BDEV_WR_RB(BCHP_NAND_LL_OP, tmp);
-
 	brcmstb_nand_send_cmd(host, CMD_LOW_LEVEL_OP);
 	return brcmstb_nand_waitfunc(mtd, chip);
 }
@@ -825,8 +824,20 @@ static void brcmstb_nand_cmdfunc(struct mtd_info *mtd, unsigned command,
 		break;
 	case NAND_CMD_SET_FEATURES:
 	case NAND_CMD_GET_FEATURES:
+	case NAND_CMD_READ_UNIQUEID:
 		brcmstb_nand_low_level_op(host, LL_OP_CMD, command, false);
 		brcmstb_nand_low_level_op(host, LL_OP_ADDR, column, false);
+		if (command == NAND_CMD_READ_UNIQUEID) {
+			/*
+			 * wait for #R/B line to go high.
+			 * For  read_uniqueid cmd ctrl_ready interrupt occurs
+			 * before #R/B line goes high hence we poll here so
+			 * that subsequent read cycles for the uniqueid occur
+			 * as per the specs.
+			 */
+			native_cmd = CMD_NULL;
+			brcmstb_nand_ctrl_busy_poll(mtd, NAND_CTRL_RDY);
+		}
 		break;
 	case NAND_CMD_RNDOUT:
 		native_cmd = CMD_PARAMETER_CHANGE_COL;
@@ -923,6 +934,15 @@ static uint8_t brcmstb_nand_read_byte(struct mtd_info *mtd)
 		} else {
 			bool last = host->last_byte ==
 				ONFI_SUBFEATURE_PARAM_LEN - 1;
+			brcmstb_nand_low_level_op(host, LL_OP_RD, 0, last);
+			ret = BDEV_RD(BCHP_NAND_LL_RDDATA) & 0xff;
+		}
+		break;
+	case NAND_CMD_READ_UNIQUEID:
+		if (host->last_byte >= UNIQUEID_LEN) {
+			ret = 0;
+		} else {
+			bool last = host->last_byte == UNIQUEID_LEN - 1;
 			brcmstb_nand_low_level_op(host, LL_OP_RD, 0, last);
 			ret = BDEV_RD(BCHP_NAND_LL_RDDATA) & 0xff;
 		}

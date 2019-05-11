@@ -1705,9 +1705,15 @@ static int brcmstb_get_page(struct mm_struct *mm, struct vm_area_struct *vma,
 		goto out;
 
 #if defined(CONFIG_BRCMSTB_BMEM) || defined(CONFIG_MIPS)
-	if (likely(bmem_find_region((phys_addr_t)pfn << PAGE_SHIFT, PAGE_SIZE)
-		   >= 0))
-		goto found_page;
+	if (unlikely(bmem_find_region((phys_addr_t)pfn << PAGE_SHIFT, PAGE_SIZE)
+		   >= 0)) {
+		if (page) {
+			*page = tmp_page;
+			get_page(*page);
+		}
+		ret = 0;
+		goto out;
+	}
 #endif
 
 #ifdef CONFIG_CMA
@@ -1717,17 +1723,15 @@ static int brcmstb_get_page(struct mm_struct *mm, struct vm_area_struct *vma,
 	if (page_mapped(tmp_page))
 		goto out;
 
-	if (get_pageblock_migratetype(tmp_page) != MIGRATE_CMA)
-		goto found_page;
-#endif
-
-found_page:
-	if (page) {
-		*page = tmp_page;
-		get_page(*page);
+	if (get_pageblock_migratetype(tmp_page) == MIGRATE_CMA) {
+		if (page) {
+			*page = tmp_page;
+			get_page(*page);
+		}
+		ret = 0;
+		goto out;
 	}
-	ret = 0;
-
+#endif
 out:
 	pte_unmap(pte);
 	return ret;

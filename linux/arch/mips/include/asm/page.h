@@ -170,11 +170,33 @@ typedef struct { unsigned long pgprot; } pgprot_t;
     unsigned long __x = (unsigned long)(x);				\
     __x < CKSEG0 ? XPHYSADDR(__x) : CPHYSADDR(__x);			\
 })
+#elif defined(CONFIG_BRCM_UPPER_256MB)
+#define __pa(addr)							\
+({									\
+	unsigned long __addr = (unsigned long)(addr);			\
+	if (__addr < CAC_BASE_UPPER)					\
+		__addr = __addr - PAGE_OFFSET + PHYS_OFFSET;		\
+	else								\
+		__addr = __addr - CAC_BASE_UPPER + UPPERMEM_START;	\
+	__addr;								\
+})
 #else
 #define __pa(x)								\
     ((unsigned long)(x) - PAGE_OFFSET + PHYS_OFFSET)
 #endif
+#if defined(CONFIG_BRCM_UPPER_256MB)
+#define __va(addr)							\
+({									\
+	unsigned long __addr = (unsigned long)(addr);			\
+	if (__addr < UPPERMEM_START)					\
+		__addr = __addr + PAGE_OFFSET - PHYS_OFFSET;		\
+	else								\
+		__addr = __addr + CAC_BASE_UPPER - UPPERMEM_START;	\
+	(void *)__addr;							\
+})
+#else
 #define __va(x)		((void *)((unsigned long)(x) + PAGE_OFFSET - PHYS_OFFSET))
+#endif
 #include <asm/io.h>
 
 /*
@@ -230,7 +252,26 @@ extern int __virt_addr_valid(const volatile void *kaddr);
 #define VM_DATA_DEFAULT_FLAGS	(VM_READ | VM_WRITE | VM_EXEC | \
 				 VM_MAYREAD | VM_MAYWRITE | VM_MAYEXEC)
 
-#if defined(CONFIG_BRCM_UPPER_768MB)
+#if defined(CONFIG_BRCM_UPPER_256MB)
+#define UNCAC_ADDR(addr)						\
+{(									\
+	unsigned long __addr = (unsigned long)(addr);			\
+	if (__addr < CAC_BASE_UPPER)					\
+		__addr = __addr - PAGE_OFFSET + UNCAC_BASE;		\
+	else								\
+		__addr = __addr - CAC_BASE_UPPER + UNCAC_BASE_UPPER;	\
+	(void *)__addr;							\
+})
+#define CAC_ADDR(addr)							\
+({									\
+	unsigned long __addr = (addr);					\
+	if (__addr < UNCAC_BASE_UPPER)					\
+		__addr = __addr - UNCAC_BASE + PAGE_OFFSET;		\
+	else								\
+		__addr = __addr - UNCAC_BASE_UPPER + CAC_BASE_UPPER;	\
+	__addr;								\
+})
+#elif defined(CONFIG_BRCM_UPPER_768MB)
 
 /* uncached kseg1 does not exist in this configuration */
 

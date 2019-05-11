@@ -169,7 +169,7 @@ static inline ssize_t dump_core_regs(unsigned long cbr,
 	return bytes;
 }
 
-#ifdef CONFIG_CPU_BMIPS3300
+#ifdef CONFIG_CPU_BMIPS32_3300
 static ssize_t show_bmips3300_core_regs(struct device *dev,
 	struct device_attribute *attr, char *buf)
 {
@@ -229,7 +229,7 @@ static struct device_attribute brcmstb_attr_list[] = {
 	__ATTR(cp0_config_regs, 0444, show_cp0_config_regs, NULL),
 	__ATTR(cpu_khz, 0444, show_cpu_khz, NULL),
 #endif
-#if   defined(CONFIG_CPU_BMIPS3300)
+#if   defined(CONFIG_CPU_BMIPS32_3300)
 	__ATTR(cp0_brcm_regs, 0444, show_cp0_brcm_regs, NULL),
 	__ATTR(bmips3300_core_regs, 0444, show_bmips3300_core_regs, NULL),
 #elif defined(CONFIG_CPU_BMIPS4380)

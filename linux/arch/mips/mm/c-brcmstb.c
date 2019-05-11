@@ -370,7 +370,7 @@ EXPORT_SYMBOL(brcm_cacheflush);
  */
 void brcm_inv_prefetch(unsigned long addr, unsigned long size)
 {
-#if defined(CONFIG_CPU_BMIPS3300)
+#if defined(CONFIG_CPU_BMIPS32_3300)
 	DEV_SET_RB(__BMIPS_GET_CBR() + BMIPS_RAC_CONFIG, 0x100);
 #elif defined(CONFIG_CPU_BMIPS4380)
 	DEV_SET_RB(__BMIPS_GET_CBR() + BMIPS_RAC_CONFIG, 0x100);
@@ -481,7 +481,7 @@ void brcm_get_cache_info(struct brcm_cache_info *info)
 #if defined(CONFIG_BRCM_ZSCM_L2)
 	/* chips with prefetching L2 */
 	info->prefetch_enabled = 1;
-#elif defined(CONFIG_CPU_BMIPS3300) || defined(CONFIG_CPU_BMIPS4380)
+#elif defined(CONFIG_CPU_BMIPS32_3300) || defined(CONFIG_CPU_BMIPS4380)
 	/* chips with write-through RAC */
 	info->max_writethrough = info->max_writeback * 4;
 	info->prefetch_enabled = 1;
