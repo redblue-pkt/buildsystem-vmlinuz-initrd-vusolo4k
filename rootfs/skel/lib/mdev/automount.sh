@@ -31,6 +31,8 @@ ROOTFSDEV_MIN_SIZE=943104	# 921 MB
 #ENDSECTOR=$((5746688+1886207))
 ENDSECTOR=7632895
 
+REV=8fce0c4
+
 echo "Vuplus Update Start.."
 insmod /etc/vfd_proc.ko
 
@@ -68,7 +70,7 @@ V_ENV_BOOT_USB_WITH_HDD=/vuplus/$VU_MODEL/boot_env_usbdisk0_with_hdd
 V_ENV_BOOT_USB_WITHOUT_HDD=/vuplus/$VU_MODEL/boot_env_usbdisk0_without_hdd
 
 update_welcome_message () {
-	echo -e "Start\nUpdate Script\n" > /tmp/msg
+	echo -e "Update Script\nVer: $REV" > /tmp/msg
 	cat /tmp/msg > /proc/vfd
 	sleep 5;
 }
