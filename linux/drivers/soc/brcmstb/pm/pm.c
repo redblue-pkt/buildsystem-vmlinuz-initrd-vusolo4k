@@ -1,7 +1,7 @@
 /*
  * ARM-specific support for Broadcom STB S2/S3/S5 power management
  *
- * Copyright © 2014 Broadcom Corporation
+ * Copyright © 2014-2018 Broadcom
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -39,6 +39,7 @@
 #include <linux/kconfig.h>
 #include <linux/sort.h>
 #include <linux/notifier.h>
+#include <linux/irqchip/arm-gic.h>
 #include <asm/fncpy.h>
 #include <asm/suspend.h>
 #include <asm/setup.h>
@@ -381,6 +382,15 @@ static void brcmstb_do_pmsm_power_down(unsigned long base_cmd)
 {
 	void __iomem *base = ctrl.aon_ctrl_base;
 
+	/*
+	 * If the CPU is committed to power down, make sure
+	 * the PMSM will be in charge of waking it up upon IRQ,
+	 * i.e. IRQ lines are cut from GIC CPU IF to the CPU by
+	 * disabling the GIC CPU IF to prevent wfi from completing
+	 * execution behind the PMSM's back
+	 */
+	gic_cpu_if_down();
+
 	/* pm_start_pwrdn transition 0->1 */
 	__raw_writel(base_cmd, base + AON_CTRL_PM_CTRL);
 	(void)__raw_readl(base + AON_CTRL_PM_CTRL);
@@ -389,6 +399,9 @@ static void brcmstb_do_pmsm_power_down(unsigned long base_cmd)
 	(void)__raw_readl(base + AON_CTRL_PM_CTRL);
 
 	wfi();
+
+	/* Execution can only be resumed through the reset vector */
+	while(1);
 }
 
 /* Support S5 cold boot out of "poweroff" */

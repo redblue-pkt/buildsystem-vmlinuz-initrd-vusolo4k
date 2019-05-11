@@ -28,7 +28,6 @@
 #include <linux/list.h>
 #include <linux/msi.h>
 #include <linux/printk.h>
-#include <linux/syscore_ops.h>
 #include <linux/of_irq.h>
 #include <linux/of_platform.h>
 #include <linux/of_address.h>
@@ -160,6 +159,7 @@ struct brcm_pcie {
 	bool			bridge_setup_done;
 	struct pci_bus		*bus;
 	int			id;
+	bool			ep_wakeup_capable;
 };
 
 static struct list_head brcm_pcie = LIST_HEAD_INIT(brcm_pcie);
@@ -168,7 +168,6 @@ static unsigned int brcm_pcie_used;
 static int num_memc;
 static void turn_off(void __iomem *base);
 static void enter_l23(struct brcm_pcie *pcie);
-static struct syscore_ops pcie_pm_ops;
 
 /***********************************************************************
  * PCIe Bridge setup
@@ -199,8 +198,6 @@ static int add_pcie(struct brcm_pcie *pcie)
 	pcie->id = i;
 	snprintf(pcie->name, sizeof(pcie->name)-1, "PCIe%d", pcie->id);
 	brcm_pcie_used |= (1 << i);
-	if (IS_ENABLED(CONFIG_PM) && list_empty(&brcm_pcie))
-		register_syscore_ops(&pcie_pm_ops);
 	list_add_tail(&pcie->list, &brcm_pcie);
 	mutex_unlock(&brcm_pcie_lock);
 	return 0;
@@ -223,8 +220,6 @@ static void remove_pcie(struct brcm_pcie *pcie)
 			brcm_pcie_used &= ~(1 << pcie->id);
 			pcie->id = -1;
 			list_del(pos);
-			if (IS_ENABLED(CONFIG_PM) && list_empty(&brcm_pcie))
-				unregister_syscore_ops(&pcie_pm_ops);
 			break;
 		}
 	}
@@ -776,9 +771,6 @@ static int brcm_setup_pcie_bridge(struct brcm_pcie *pcie)
 }
 
 
-/*
- * syscore device to handle PCIe bus suspend and resume
- */
 static void turn_off(void __iomem *base)
 {
 	/* Reset endpoint device */
@@ -810,10 +802,33 @@ static void enter_l23(struct brcm_pcie *pcie)
 		dev_err(pcie->dev, "failed to enter L23\n");
 }
 
+static int pci_dev_may_wakeup(struct pci_dev *dev, void *data)
+{
+	bool *ret = data;
+
+	if (device_may_wakeup(&dev->dev)) {
+		*ret = true;
+		dev_info(&dev->dev, "disable cancelled for wake-up device\n");
+	}
+	return (int) *ret;
+}
+
 static void pcie_regulator_disable(struct brcm_pcie *pcie)
 {
 	struct list_head *pos;
+	struct pci_bus *bus = pcie->bus;
 	struct brcm_dev_pwr_supply *supply;
+
+	/*
+	 * If at least one device on this bus is enabled as a wake-up
+	 * source, do not turn off regulators
+	 */
+	pcie->ep_wakeup_capable = false;
+	if (pcie->bridge_setup_done) {
+		pci_walk_bus(bus, pci_dev_may_wakeup, &pcie->ep_wakeup_capable);
+		if (pcie->ep_wakeup_capable)
+			return;
+	}
 
 	list_for_each(pos, &pcie->pwr_supplies) {
 		supply = list_entry(pos, struct brcm_dev_pwr_supply,
@@ -835,7 +850,7 @@ static void pcie_suspend_one(struct brcm_pcie *pcie)
 	pcie->bridge_setup_done = false;
 }
 
-static int pcie_suspend(void)
+static int brcm_pcie_suspend(struct device *dev)
 {
 	struct brcm_pcie *pcie;
 
@@ -849,6 +864,17 @@ static void pcie_regulator_enable(struct brcm_pcie *pcie)
 {
 	struct list_head *pos;
 	struct brcm_dev_pwr_supply *supply;
+
+	if (pcie->ep_wakeup_capable) {
+		/*
+		 * We are resuming from a suspend.  In the suspend we
+		 * did not disable the power supplies, so there is
+		 * no need to enable them (and falsely increase their
+		 * usage count).
+		 */
+		pcie->ep_wakeup_capable = false;
+		return;
+	}
 
 	list_for_each(pos, &pcie->pwr_supplies) {
 		supply = list_entry(pos, struct brcm_dev_pwr_supply,
@@ -881,20 +907,14 @@ static void pcie_resume_one(struct brcm_pcie *pcie)
 	brcm_setup_pcie_bridge(pcie);
 }
 
-static void pcie_resume(void)
+static int brcm_pcie_resume(struct device *dev)
 {
 	struct brcm_pcie *pcie;
 
 	list_for_each_entry(pcie, &brcm_pcie, list)
 		pcie_resume_one(pcie);
+	return 0;
 }
-
-
-static struct syscore_ops pcie_pm_ops = {
-	.suspend        = pcie_suspend,
-	.resume         = pcie_resume,
-};
-
 
 /***********************************************************************
  * Read/write PCI configuration registers
@@ -1342,6 +1362,11 @@ static int brcm_pci_remove(struct platform_device *pdev)
 	return 0;
 }
 
+static const struct dev_pm_ops brcm_pcie_pm_ops = {
+	.suspend_noirq = brcm_pcie_suspend,
+	.resume_noirq = brcm_pcie_resume,
+};
+
 static struct platform_driver __refdata brcm_pci_driver = {
 	.probe = brcm_pci_probe,
 	.remove = brcm_pci_remove,
@@ -1349,6 +1374,7 @@ static struct platform_driver __refdata brcm_pci_driver = {
 		.name = "brcm-pci",
 		.owner = THIS_MODULE,
 		.of_match_table = brcm_pci_match,
+		.pm = &brcm_pcie_pm_ops,
 	},
 };
 
