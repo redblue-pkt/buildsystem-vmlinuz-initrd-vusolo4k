@@ -92,6 +92,7 @@ images: .target
 	$(MAKE) $(MAKEOPTS) modules
 	$(MAKE) $(MAKEOPTS) initrd_kernel
 	$(MAKE) $(MAKEOPTS) kernel
+	bin/actual_git_branch.sh
 	bin/build_rootfs_images.sh
 	@echo ""
 	@echo "Build complete.  Images are in images/"
@@ -153,6 +154,7 @@ rootfs: .target chkpath
 	fi
 
 	find ./romfs -name '*' -exec arm-linux-strip --strip-unneeded {} &>/dev/null \;
+	bin/actual_git_branch.sh  > romfs/etc/revision
 
 modules:
 	$(MAKE) -C $(LINUXDIR) SUBDIRS= ARCH="$(ARCH)" modules
