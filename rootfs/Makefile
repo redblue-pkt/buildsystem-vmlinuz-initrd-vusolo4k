@@ -152,7 +152,7 @@ rootfs: .target chkpath
 			INITRD_SUBDIR="$(SUBDIRS)" || exit 1 ; \
 	fi
 
-	find ./romfs -name '*' -exec /home/bpanther/buildsystem-vmlinuz-initrd-vusolo4k/toolchains/stbgcc-6.3-1.2/bin/arm-linux-strip --strip-unneeded {} &>/dev/null \;
+	find ./romfs -name '*' -exec arm-linux-strip --strip-unneeded {} &>/dev/null \;
 
 modules:
 	$(MAKE) -C $(LINUXDIR) SUBDIRS= ARCH="$(ARCH)" modules
