@@ -92,7 +92,6 @@ images: .target
 	$(MAKE) $(MAKEOPTS) modules
 	$(MAKE) $(MAKEOPTS) initrd_kernel
 	$(MAKE) $(MAKEOPTS) kernel
-	bin/actual_git_branch.sh
 	bin/build_rootfs_images.sh
 	@echo ""
 	@echo "Build complete.  Images are in images/"
