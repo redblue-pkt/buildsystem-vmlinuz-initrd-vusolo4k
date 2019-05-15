@@ -6,7 +6,7 @@ cd rootfs
 if [ ! -e images ]; then
 	mkdir images
 fi
-#make images -j8
+make images -j8
 cd images
 if [ -e $FILE ]; then
 	tar -cvf $TAR_IMAGE $FILE
