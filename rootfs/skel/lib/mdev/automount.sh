@@ -62,12 +62,12 @@ V_KERNEL_4_FILENAME=/vuplus/$VU_MODEL/kernel4_auto.bin
 
 V_SPLASH_FILENAME=/vuplus/$VU_MODEL/splash_auto.bin
 
-V_ENV_BOOT_PART1=/vuplus/$VU_MODEL/boot_env_mmcblk0p5
-V_ENV_BOOT_PART2=/vuplus/$VU_MODEL/boot_env_mmcblk0p7
-V_ENV_BOOT_PART3=/vuplus/$VU_MODEL/boot_env_mmcblk0p9
-V_ENV_BOOT_PART4=/vuplus/$VU_MODEL/boot_env_mmcblk0p11
-V_ENV_BOOT_USB_WITH_HDD=/vuplus/$VU_MODEL/boot_env_usbdisk0_with_hdd
-V_ENV_BOOT_USB_WITHOUT_HDD=/vuplus/$VU_MODEL/boot_env_usbdisk0_without_hdd
+V_ENV_BOOT_PART1=/vuplus/$VU_MODEL/STARTUP_1
+V_ENV_BOOT_PART2=/vuplus/$VU_MODEL/STARTUP_2
+V_ENV_BOOT_PART3=/vuplus/$VU_MODEL/STARTUP_3
+V_ENV_BOOT_PART4=/vuplus/$VU_MODEL/STARTUP_4
+V_ENV_BOOT_USB_WITH_HDD=/vuplus/$VU_MODEL/STARTUP_USB_HDD
+V_ENV_BOOT_USB_WITHOUT_HDD=/vuplus/$VU_MODEL/STARTUP_USB_NOHDD
 
 update_welcome_message () {
 	echo -e "Update Script\nVer $REV\n" > /tmp/msg
@@ -309,9 +309,9 @@ update_rootfs () {
 			elif [ $1 == 4 ]; then
 				cp -R $2 /mnt/startup/STARTUP_4
                         elif [ $1 == 5 ]; then
-                                cp -R $2 /mnt/startup/usb_with_hdd
+                                cp -R $2 /mnt/startup/STARTUP_USB_HDD
                         elif [ $1 == 6 ]; then
-                                cp -R $2 /mnt/startup/usb_without_hdd
+                                cp -R $2 /mnt/startup/STARTUP_USB_NOHDD
 			fi
 
 			nvram unset STARTUP
