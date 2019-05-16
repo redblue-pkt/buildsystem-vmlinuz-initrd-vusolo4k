@@ -298,8 +298,8 @@ update_rootfs () {
 				echo "boot emmcflash0.kernel_2 'root=/dev/mmcblk0p7 rw rootwait rootflags=data=journal debug coherent_pool=2M brcm_cma=504M@0x10000000 brcm_cma=260M@0x2f800000 brcm_cma=1024M@0x80000000'" >> /mnt/startup/STARTUP_2
 				echo "boot emmcflash0.kernel_3 'root=/dev/mmcblk0p9 rw rootwait rootflags=data=journal debug coherent_pool=2M brcm_cma=504M@0x10000000 brcm_cma=260M@0x2f800000 brcm_cma=1024M@0x80000000'" >> /mnt/startup/STARTUP_3
 				echo "boot emmcflash0.kernel_4 'root=/dev/mmcblk0p11 rw rootwait rootflags=data=journal debug coherent_pool=2M brcm_cma=504M@0x10000000 brcm_cma=260M@0x2f800000 brcm_cma=1024M@0x80000000'" >> /mnt/startup/STARTUP_4
-				echo "boot -fatfs usbdisk0:zImage 'root=/dev/sdb2 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M brcm_cma=504M@0x10000000 brcm_cma=260M@0x2f800000 brcm_cma=1024M@0x80000000'" >> /mnt/startup/usb_with_hdd
-				echo "boot -fatfs usbdisk0:zImage 'root=/dev/sda2 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M brcm_cma=504M@0x10000000 brcm_cma=260M@0x2f800000 brcm_cma=1024M@0x80000000'" >> /mnt/startup/usb_without_hdd
+				echo "boot -fatfs usbdisk0:zImage 'root=/dev/sdb2 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M brcm_cma=504M@0x10000000 brcm_cma=260M@0x2f800000 brcm_cma=1024M@0x80000000'" >> /mnt/startup/STARTUP_USB_HDD
+				echo "boot -fatfs usbdisk0:zImage 'root=/dev/sda2 rw rootwait rootflags=data=journal rootfstype=ext4 systemd.gpt_auto=0 consoleblank=0 vt.global_cursor_default=0 loglevel=7 coherent_pool=2M brcm_cma=504M@0x10000000 brcm_cma=260M@0x2f800000 brcm_cma=1024M@0x80000000'" >> /mnt/startup/STARTUP_USB_NOHDD
 			elif [ $1 == 1 ]; then
 				cp -R $2 /mnt/startup/STARTUP_1
 			elif [ $1 == 2 ]; then
