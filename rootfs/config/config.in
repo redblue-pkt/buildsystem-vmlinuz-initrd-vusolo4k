@@ -43,7 +43,7 @@ choice 'Shell Program'	"Sash		CONFIG_USER_SASH_SH \
 			 nwsh		CONFIG_USER_NWSH_SH \
 			 bash		CONFIG_USER_BASH_BASH \
 			 Other		CONFIG_USER_OTHER_SH \
-			" Other
+			" Sash
 if [ "$CONFIG_USER_SASH_SH" = "y" ]; then
 	bool 'simple history (sash)'		CONFIG_USER_SASH_HISTORY
 fi
